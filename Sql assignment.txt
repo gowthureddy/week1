@@ -1,0 +1,148 @@
+1.Write a query to display account number, customer’s number, customer’s firstname,lastname,account opening date.
+
+Display the records sorted in ascending order based on account number
+
+CREATE TABLE customer_master(
+CUSTOMER_NUMBER VARCHAR(6),
+FIRSTNAME VARCHAR(30),
+MiddleName VARCHAR(30),
+LastName VARCHAR(30),
+customer_city VARCHAR(15),
+CUSTOMER_CONTACT_NO VARCHAR(10),
+Occupation VARCHAR(10),
+CUSTOMER_DATE_OF_BIRTH DATE,
+primary key(CUSTOMER_NUMBER));
+
+
+CREATE TABLE account_master
+(account_number VARCHAR(255),
+customer_number VARCHAR(255),
+branch_id VARCHAR(255),
+opening_balance integer(20),
+account_opening_date DATE,
+account_type VARCHAR(25),
+account_status VARCHAR(10),
+PRIMARY KEY (account_number),
+FOREIGN KEY (customer_number) references customer_master(customer_number),
+FOREIGN KEY (branch_id) references branch_master(branch_id));
+
+CREATE TABLE branch_master(
+branch_id VARCHAR(6),
+branch_name VARCHAR(30),
+branch_city VARCHAR(30),
+PRIMARY KEY (branch_id));
+CREATE TABLE account_master
+(account_number VARCHAR(255),
+customer_number VARCHAR(255),
+branch_id VARCHAR(255),
+opening_balance integer(20),
+account_opening_date DATE,
+account_type VARCHAR(25),
+account_status VARCHAR(10),
+PRIMARY KEY (account_number),
+FOREIGN KEY (customer_number) references customer_master(customer_number),
+FOREIGN KEY (branch_id) references branch_master(branch_id));
+SELECT am.account_number,cm.customer_number,cm.firstname,cm.lastname,am.account_opening_date
+
+FROM customer_master cm INNER JOIN account_master am
+
+ON cm.customer_number=am.customer_number
+
+ORDER BY account_number
+
+
+2.Write a query to display the number of customer’s from Chennai. Give the count an alias name of Cust_Count.
+
+SELECT count(customer_number) as Cust_Count
+
+FROM customer_master
+
+WHERE customer_city='Chennai'
+
+3.Write a query to display  the customer number, customer firstname,account number for the customer’s whose accounts were created after 15th of any month.
+
+Display the records sorted in ascending order based on customer number and then by account number.
+
+SELECT  cm.customer_number, cm.firstname, am.account_number
+
+FROM customer_master cm INNER JOIN account_master am
+
+ON cm.customer_number=am.customer_number
+
+WHERE extract(day from account_opening_date)>15
+
+ORDER BY am.customer_number, account_number
+
+
+4.Write a query to display the number of customers who have registration but no account in the bank.
+
+Give the alias name as Count_Customer for number of customers.
+
+SELECT count(customer_number) as Count_Customer
+
+FROM customer_master
+
+WHERE customer_number NOT IN (SELECT customer_number FROM account_master)
+
+
+5.Write  a query to display the firstname of the customers who have more than 1 account. Display the records in sorted order based on firstname.
+
+select cm.firstname
+
+FROM customer_master cm INNER JOIN account_master am ON cm.customer_number=am.customer_number group by firstname having count(account_number)>1 order by firstname;
+
+
+6.Write a query to display the number of clients who have asked for loans but they don’t have any account in the bank though they are registered customers. Give the count an alias name of Count.
+
+
+CREATE TABLE loan_details
+(customer_number varchar(255),
+branch_id varchar(255),
+loan_amount integer(20),
+foreign key(customer_number) references customer_master(customer_number));
+
+
+
+SELECT count(ld.customer_number) as Count
+
+FROM customer_master cm INNER JOIN loan_details ld
+
+ON  cm.customer_number=ld.customer_number
+
+WHERE cm.customer_number NOT IN ( SELECT customer_number FROM account_master)
+
+7.Write a query to display the customer’s firstname who have multiple accounts (atleast  2 accounts).  Display the records sorted in ascending order based on customer's firstname.
+
+SELECT customer_master.firstname
+
+FROM customer_master INNER JOIN account_master
+
+ON customer_master.customer_number=account_master.customer_number GROUP BY firstname
+
+having count(customer_master.firstname)>=2 order by customer_master.firstname;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
